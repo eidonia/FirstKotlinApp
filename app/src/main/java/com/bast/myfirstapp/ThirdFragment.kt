@@ -3,11 +3,13 @@ package com.bast.myfirstapp
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import android.widget.TextView
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.github.mikephil.charting.animation.Easing
@@ -15,11 +17,9 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.fragment_third.*
 
 class ThirdFragment : Fragment() {
-
 
 
     override fun onCreateView(
@@ -53,7 +53,7 @@ class ThirdFragment : Fragment() {
             findNavController().navigate(R.id.action_thirdFragment_to_FirstFragment)
         }
 
-        val vl = LineDataSet(entries, "MyData")
+        val vl = LineDataSet(entries, "Data List")
 
         vl.setDrawValues(false)
         vl.setDrawFilled(true)
@@ -76,6 +76,54 @@ class ThirdFragment : Fragment() {
 
         lineChart.animateX(1800, Easing.EaseInExpo)
 
+        val markerView = CustomMarker(requireContext(), R.layout.marker_view)
+        lineChart.marker = markerView
+
+
+
+
+        view.findViewById<Button>(R.id.buttonValue).setOnClickListener{
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+
+            val values = view.findViewById<EditText>(R.id.editValue).text.toString()
+            val valueList: List<String> = values.split(" ")
+            Log.e("list", "valueList $valueList")
+
+            val valuesArray = ArrayList<Entry>()
+
+            for (i in 0..valueList.lastIndex){
+                valuesArray.add(Entry((i+1).toFloat(), valueList[i].toFloat()))
+            }
+
+            val vl = LineDataSet(valuesArray, "Values")
+
+            vl.setDrawValues(false)
+            //vl.setDrawFilled(true)
+            vl.lineWidth = 3f
+            vl.setColors(Color.parseColor("#F48FB1"))
+            //vl.fillColor = Color.parseColor("#00FFFFFF")
+            vl.setCircleColor(Color.parseColor("#F48FB1"))
+
+            valueChart.xAxis.labelRotationAngle = 0f
+            valueChart.data = LineData(vl)
+
+            valueChart.axisRight.isEnabled = false
+            valueChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+
+            valueChart.setTouchEnabled(true)
+            valueChart.setPinchZoom(true)
+            valueChart.setNoDataText("")
+
+            valueChart.animateXY(900, 900)
+
+            val markerView = CustomMarker(requireContext(), R.layout.marker_view)
+            valueChart.marker = markerView
+
+
+
+
+        }
 
 
 
